@@ -118,14 +118,13 @@ class ToDoListViewController: UITableViewController{
         tableView.reloadData()
     }
     
-    func loadItems(){
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
-        
+    func loadItems(with request : NSFetchRequest<Item> =  Item.fetchRequest()){
         do {
             itemArray = try context.fetch(request)
         } catch {
             print("Error fetching data : \(error)")
         }
+        tableView.reloadData()
     }
     
     
@@ -140,12 +139,7 @@ extension ToDoListViewController: UISearchBarDelegate{
                                                                                          //d: diacritic-insensitive (accent, sign ...)
         request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
         
-        do {
-            itemArray = try context.fetch(request)
-        } catch {
-            print("Error fetching data : \(error)")
-        }
-        tableView.reloadData()
+       loadItems(with: request)
     }
 }
 
