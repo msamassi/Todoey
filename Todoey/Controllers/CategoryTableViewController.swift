@@ -42,7 +42,7 @@ class CategoryTableViewController: UITableViewController {
         
         alert.addTextField {
             (categoryAlertTextField) in
-            categoryAlertTextField.placeholder = "Create new Category"
+            categoryAlertTextField.placeholder = "Add new Category"
             textField = categoryAlertTextField
         }
         
@@ -65,12 +65,20 @@ class CategoryTableViewController: UITableViewController {
         
         return cell
     }
+    
     //MARK:- Tableview Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        saveCategory()
-        tableView.reloadData()
-        tableView.deselectRow(at: indexPath, animated: true)
+        performSegue(withIdentifier: "goToItems", sender: self)
     }
+    //Grab the ecatrgory that corresponds to the selected cell
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destinationVC = segue.destination as! ToDoListViewController
+        
+        if let indexPath = tableView.indexPathForSelectedRow {
+            destinationVC.selectedCategory = categoriesArray[indexPath.row]
+        }
+    }
+    
     
     //MARK:- Model handling methods
     func loadCategories(with request : NSFetchRequest<Category> = Category.fetchRequest()){
