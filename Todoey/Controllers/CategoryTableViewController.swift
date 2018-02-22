@@ -8,8 +8,11 @@
 
 import UIKit
 import RealmSwift
+import SwipeCellKit
 
 class CategoryTableViewController: UITableViewController {
+
+    
     
     let realm = try! Realm()
     
@@ -17,7 +20,10 @@ class CategoryTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         loadCategories()
+        
+        tableView.rowHeight = 80.0
     }
 
     // MARK: - Navigation
@@ -54,18 +60,35 @@ class CategoryTableViewController: UITableViewController {
         return categories?.count ?? 1   //nil coalescing operator
     }
     
+    //Commentée et remplacée par la fonction plus bas
+    //    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+//
+//        cell.textLabel?.text = categories?[indexPath.row].name ?? "No Categories added yet"
+//
+//        return cell
+//    }
+    
+    //Set the delegate property on SwipeTableViewCell:
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell") as! SwipeTableViewCell
         
         cell.textLabel?.text = categories?[indexPath.row].name ?? "No Categories added yet"
         
+        cell.delegate = self as! SwipeTableViewCellDelegate
+        
         return cell
     }
+
     
-    //MARK:- Tableview Delegate Methods
+    //MARK:- Tableview Delegate Methods (tapping)
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "goToItems", sender: self)
     }
+    
+   
+    
     //Grab the ecatrgory that corresponds to the selected cell
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let destinationVC = segue.destination as! ToDoListViewController
@@ -94,4 +117,41 @@ class CategoryTableViewController: UITableViewController {
         }
         tableView.reloadData()
     }
+}
+
+// MARK: Swipe Cell Delegate Methods
+extension CategoryTableViewController : SwipeTableViewCellDelegate {
+    //added to conform to SwipeTableViewCellDelegate
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        guard orientation == .right else { return nil }
+        
+        let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
+            // handle action by updating model with deletion
+            if let categoryForDeletion = self.categories?[indexPath.row]{
+            do {
+                try self.realm.write {
+                    self.realm.delete(categoryForDeletion)
+                }
+            } catch {
+                print("Error deleting category : \(error)")
+                }
+                
+               
+            }
+            print("Category deleted")
+        }
+        
+        // customize the action appearance
+        deleteAction.image = UIImage(named: "delete-icon")
+        
+        return [deleteAction]
+    }
+    
+    func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeTableOptions {
+        var options = SwipeTableOptions()
+        options.expansionStyle = .destructive
+//        options.transitionStyle = .border
+        return options
+    }
+    
 }
