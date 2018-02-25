@@ -21,8 +21,6 @@ class CategoryTableViewController: SwipeTableViewController {
         super.viewDidLoad()
         
         loadCategories()
-        
-        tableView.rowHeight = 80.0
     }
 
     // MARK: - Navigation
@@ -59,29 +57,20 @@ class CategoryTableViewController: SwipeTableViewController {
         return categories?.count ?? 1   //nil coalescing operator
     }
     
-
-    //Set the delegate property on SwipeTableViewCell:
-    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        //let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell") as! SwipeTableViewCell
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         cell.textLabel?.text = categories?[indexPath.row].name ?? "No Categories added yet"
         
-        //cell.delegate = self
-        
         return cell
     }
-
     
     //MARK:- Tableview Delegate Methods (tapping)
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "goToItems", sender: self)
     }
     
-   
-    
-    //Grab the ecatrgory that corresponds to the selected cell
+    //Grab the category that corresponds to the selected cell
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let destinationVC = segue.destination as! ToDoListViewController
         
@@ -89,7 +78,6 @@ class CategoryTableViewController: SwipeTableViewController {
             destinationVC.selectedCategory = categories?[indexPath.row]
         }
     }
-    
     
     //MARK:- Data Manipulation methods
     func loadCategories(){
