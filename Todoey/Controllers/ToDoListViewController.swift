@@ -36,24 +36,32 @@ class ToDoListViewController: SwipeTableViewController{
     }
 
     override func viewWillAppear(_ animated: Bool) {
-        
-        if let colourHex = selectedCategory?.colour{
-            title = selectedCategory!.name
-
-            guard let navBar = navigationController?.navigationBar else {
-                fatalError("Navigation controller does not exist")
-            }
-
-            if let navBarColour = UIColor(hexString: colourHex){
-                navBar.barTintColor = navBarColour
-                navBar.tintColor = ContrastColorOf(navBarColour, returnFlat: true)
-                navBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor : ContrastColorOf(navBarColour, returnFlat: true)]
-                searchBar.barTintColor = navBarColour
-            }
+  
+        guard let navBar = navigationController?.navigationBar else {
+            fatalError("Navigation controller does not exist")
         }
+        
+        guard let colourHex = selectedCategory?.colour else {fatalError()}
+        
+        title = selectedCategory?.name
+
+        guard let navBarColour = UIColor(hexString: colourHex) else {fatalError()}
+        
+        navBar.barTintColor = navBarColour
+        navBar.tintColor = ContrastColorOf(navBarColour, returnFlat: true)
+        navBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor : ContrastColorOf(navBarColour, returnFlat: true)]
+        searchBar.barTintColor = navBarColour
         
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        
+        guard let originalColour = UIColor(hexString: "1D9BF6") else {fatalError()}
+        navigationController?.navigationBar.barTintColor = originalColour
+        navigationController?.navigationBar.tintColor = FlatWhite()
+        navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor : ContrastColorOf(originalColour, returnFlat: true)]
+        
+    }
     
     //MARK:- Tableview Datasource Methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
